@@ -5,9 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/Roulette.sol";
 
 contract TestRoulette {
-  // The address of the roulette contract to be tested
-  // Roulette roulette = Roulette(DeployedAddresses.Roulette());
-
+  
   // Testing the croupier is the creator the contract.
   // Reference https://michalzalecki.com/ethereum-test-driven-introduction-to-solidity/
   function testCreatorIsTheCroupier() public {
