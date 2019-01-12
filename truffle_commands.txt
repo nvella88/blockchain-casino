@@ -1,0 +1,3 @@
+truffle networks --clean
+truffle compile --migrate-all --reset
+truffle migrate
