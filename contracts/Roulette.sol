@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 contract Roulette{
     // The croupier is the creator/owner of the smart contract.
-    address croupier;
+    address public croupier;
     // The roulette gas a fixed stake set by the croupier.
     uint256 tableStake;
     bool isTableOpen = false;
