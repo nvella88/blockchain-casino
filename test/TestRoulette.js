@@ -62,4 +62,16 @@ contract("Roulette", accounts => {
             assert(error.toString().includes('Already placed a bet on odd numbers.'), error.toString());
         }
     });
+
+    it("should not allow betting when bets are closed", async () => {
+        await roulette.closeBets({ from: firstAccount});
+
+        try {
+            // Invalid bet: Even
+            await roulette.betOnEvenNumber({ from: secondAccount, value: 10 });
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('Betting is not open.'), error.toString());
+        }
+    });
 });

@@ -74,6 +74,13 @@ contract Roulette{
         evenBets[msg.sender] = true;
     }
 
+    // Closes the bets.
+    // Only the croupier is allowed to close bets.
+    // The function is called before drawing the number, that is, before the roulette starts 'spinning'.
+    function closeBets() public ownerRequired {
+        isBettingOpen = false;
+    }
+
     // Closes the table, destroying the smart contract.
     // Only the croupier is allowed to close the table.
     function closeTable() public ownerRequired {
