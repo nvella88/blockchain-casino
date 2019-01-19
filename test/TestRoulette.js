@@ -63,15 +63,54 @@ contract("Roulette", accounts => {
         }
     });
 
-    it("should not allow betting when bets are closed", async () => {
-        await roulette.closeBets({ from: firstAccount});
+    it("should not allow betting when the table is closed for betting", async () => {
+        await roulette.closeBets({ from: firstAccount });
 
         try {
             // Invalid bet: Even
             await roulette.betOnEvenNumber({ from: secondAccount, value: 10 });
             assert.fail()
         } catch (error) {
-            assert(error.toString().includes('Betting is not open.'), error.toString());
+            assert(error.toString().includes('The table is not open.'), error.toString());
+        }
+    });
+
+    it("should set the winning number correctly", async () => {
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(5);
+
+        var winningNumber = roulette.getWinningNumber();
+        assert(winningNumber, 5);
+
+    });
+
+    it("should not set the winning number if bets are allowed", async () => {
+        try {
+            await roulette.setWinningNumber(5);
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('The table must be closed for betting.'), error.toString());
+        }
+    });
+
+    it("should not set the winning number if input is invalid", async () => {
+        await roulette.closeBets({ from: firstAccount });
+        try {
+            await roulette.setWinningNumber(40);
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('A valid roulette number is required.'), error.toString());
+        }
+    });
+
+    it("should not set the winning number twice", async () => {
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(5);
+        try {
+            await roulette.setWinningNumber(7);
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('The winning number is already set.'), error.toString());
         }
     });
 });
