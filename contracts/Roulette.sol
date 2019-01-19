@@ -5,7 +5,7 @@ contract Roulette{
     address public croupier;
     
     // The roulette gas a fixed stake set by the croupier.
-    uint256 private tableStakeInWei;
+    uint private tableStakeInWei;
     
     bool private isTableOpen = false;
     bool private isBettingOpen = false;
@@ -14,8 +14,6 @@ contract Roulette{
     // It is not allowed to bet on both in one session.
     mapping(address => bool) private oddBets;
     mapping(address => bool) private evenBets;
-    uint private oddBetsCounter;
-    uint private evenBetsCounter;
 
     // Function modifier which requires the caller 
     // of the function to be the owner of the contract.
@@ -33,10 +31,10 @@ contract Roulette{
     // Payment must match stake.
     // Table is open and betting allowed.
     modifier bettingRequirements {
-        require(croupier == msg.sender, "The house is not allowed to bet.");
+        require(!(croupier == msg.sender), "The house is not allowed to bet.");
         require(msg.value == tableStakeInWei, "Must match the table stake.");
-        require(!isTableOpen,"The table is not open.");
-        require(!isBettingOpen,"Betting is not open.");
+        require(isTableOpen,"The table is not open.");
+        require(isBettingOpen,"Betting is not open.");
         _;
     }
 
@@ -47,10 +45,14 @@ contract Roulette{
         tableStakeInWei = stakeAmountInWei;
         isTableOpen = true;
         isBettingOpen = true;
-        oddBetsCounter = 0;
-        evenBetsCounter = 0;
     }
 
+    // A function in which state is not changed. This is denoted by the view modifier.
+    function getTableStake() public view returns (uint) {
+        return tableStakeInWei;
+    }
+
+    // Place a bet that the resullt will be an odd number.
     function betOnOddNumber() public payable bettingRequirements
     {   
         // One cannot bet twice the same bet.
@@ -59,9 +61,9 @@ contract Roulette{
         require(!(evenBets[msg.sender]), "Already placed a bet on even numbers.");
         
         oddBets[msg.sender] = true;
-        oddBetsCounter += 1;
     }
 
+    // Bet that the result will be an even number.
     function betOnEvenNumber() public payable bettingRequirements
     {        
         // One cannot bet twice the same bet.
@@ -70,11 +72,10 @@ contract Roulette{
         require(!(oddBets[msg.sender]), "Already placed a bet on odd numbers.");
         
         evenBets[msg.sender] = true;
-        evenBetsCounter += 1;
     }
 
     // Closes the table, destroying the smart contract.
-    // Only the creator of the 
+    // Only the croupier is allowed to close the table.
     function closeTable() public ownerRequired {
         // Convert croupier frm address to address payable.
         selfdestruct(address(uint160(croupier)));
