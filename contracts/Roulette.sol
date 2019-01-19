@@ -3,9 +3,19 @@ pragma solidity ^0.4.24;
 contract Roulette{
     // The croupier is the creator/owner of the smart contract.
     address public croupier;
+    
     // The roulette gas a fixed stake set by the croupier.
-    uint256 tableStake;
-    bool isTableOpen = false;
+    uint256 private tableStakeInWei;
+    
+    bool private isTableOpen = false;
+    bool private isBettingOpen = false;
+    
+    // Mapping to check if an address placed a bet on either odd or even numbers.
+    // It is not allowed to bet on both in one session.
+    mapping(address => bool) private oddBets;
+    mapping(address => bool) private evenBets;
+    uint private oddBetsCounter;
+    uint private evenBetsCounter;
 
     // Function modifier which requires the caller 
     // of the function to be the owner of the contract.
@@ -18,11 +28,49 @@ contract Roulette{
         _;
     }
 
-    constructor(uint256 stakeAmount) public
+    // Common requirements to place bets, refactored under one modifier.
+    // The croupier/owner cannot place a bet.
+    // Payment must match stake.
+    // Table is open and betting allowed.
+    modifier bettingRequirements {
+        require(croupier == msg.sender, "The house is not allowed to bet.");
+        require(msg.value == tableStakeInWei, "Must match the table stake.");
+        require(!isTableOpen,"The table is not open.");
+        require(!isBettingOpen,"Betting is not open.");
+        _;
+    }
+
+    constructor(uint stakeAmountInWei) public
     {
+        require(stakeAmountInWei > 0, "A stake is required to open a table.");
         croupier = msg.sender;
-        tableStake = stakeAmount;
+        tableStakeInWei = stakeAmountInWei;
         isTableOpen = true;
+        isBettingOpen = true;
+        oddBetsCounter = 0;
+        evenBetsCounter = 0;
+    }
+
+    function betOnOddNumber() public payable bettingRequirements
+    {   
+        // One cannot bet twice the same bet.
+        require(!(oddBets[msg.sender]), "Already placed a similar bet.");
+        // Either bet on odd or even.
+        require(!(evenBets[msg.sender]), "Already placed a bet on even numbers.");
+        
+        oddBets[msg.sender] = true;
+        oddBetsCounter += 1;
+    }
+
+    function betOnEvenNumber() public payable bettingRequirements
+    {        
+        // One cannot bet twice the same bet.
+        require(!(evenBets[msg.sender]), "Already placed a similar bet.");
+        // Either bet on odd or even.
+        require(!(oddBets[msg.sender]), "Already placed a bet on odd numbers.");
+        
+        evenBets[msg.sender] = true;
+        evenBetsCounter += 1;
     }
 
     // Closes the table, destroying the smart contract.

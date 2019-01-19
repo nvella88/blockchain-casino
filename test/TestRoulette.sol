@@ -17,6 +17,7 @@ contract TestRoulette {
   // Reference https://michalzalecki.com/ethereum-test-driven-introduction-to-solidity/
   function testCreatorIsTheCroupierForADeployedContract() public {
     Roulette roulette = Roulette(DeployedAddresses.Roulette());
+    // This is valid because in truffle the address used to deploy Roulette.sol is the same addres calling the Test Smart contract
     Assert.equal(roulette.croupier(), msg.sender, "The deployer and croupier do not match.");
   }
 }
