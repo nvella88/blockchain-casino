@@ -150,6 +150,22 @@ contract Roulette{
         }
     }
 
+    // Winnings are not paid automatically, instead the users call the withdraw function.
+    // 
+    function withdrawWinnings() public {
+        uint transferAmount = playerWinnings[msg.sender];
+        
+        require(!isTableOpen,"The table is not closed for betting.");
+        require(winningNumber > -1, "No winning number is set.");
+        require(playerWinnings[msg.sender] != 0, "There are no withdrawable winnings.");
+        require(address(this).balance >= playerWinnings[msg.sender], "There are not enough funds to transfer.");
+        
+        
+        // Set the winnings mapping to 0 before the transfer.
+        playerWinnings[msg.sender] = 0;
+        msg.sender.transfer(transferAmount);
+    }
+
     // A function in which checks is betting is allowed.
     // The idea behind this function is not to allow the roulette 'spin' while players are allowed to bet.
     function isBettingAllowed() public view returns (bool) {
@@ -164,6 +180,13 @@ contract Roulette{
     // Get the winning number.
     function isPlayerSessionCreated(address player) public ownerRequired view returns (bool) {
          return playerSessions[player].isSessionCreated;
+    }
+
+    // Check own winnings.
+    function getWithdrawableBalance() public view returns (uint) {
+        require(!isTableOpen,"The table is not closed for betting.");
+        require(winningNumber > -1, "No winning number is set.");
+        return playerWinnings[msg.sender];
     }
 
     // Closes the table, destroying the smart contract.

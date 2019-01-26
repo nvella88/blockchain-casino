@@ -4,7 +4,7 @@ contract("Roulette", accounts => {
     // Truffle deploys the smart contract using the first address by default.
     // This makes the first account the croupier.
     // This scenario is covered in TestRoulette.sol.
-    const [firstAccount, secondAccount] = accounts;
+    const [firstAccount, secondAccount, thirdAccount, fourthAccount] = accounts;
     let roulette;
 
     // Common setup before executing each test.
@@ -123,5 +123,54 @@ contract("Roulette", accounts => {
         } catch (error) {
             assert(error.toString().includes('The winning number is already set.'), error.toString());
         }
+    });
+
+    it("should allow winning accounts to withdraw", async () => {
+        // Place some bets, close betting and set a winning number.
+        await roulette.betOnOddNumber({ from: secondAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: thirdAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: fourthAccount, value: 10 });
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(5);
+
+        var resultSecondAccount = await roulette.getWithdrawableBalance({ from: secondAccount});
+        var resultThirdAccount = await roulette.getWithdrawableBalance({ from: thirdAccount});
+        var resultFourthAccount = await roulette.getWithdrawableBalance({ from: fourthAccount});
+        
+        assert.equal(resultSecondAccount.toString(), 20)
+        assert.equal(resultThirdAccount.toString(), 0)
+        assert.equal(resultFourthAccount.toString(), 0)
+    });
+
+    it("should not allow to withdraw winnings twice", async () => {
+        // Place some bets, close betting and set a winning number.
+        await roulette.betOnOddNumber({ from: secondAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: thirdAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: fourthAccount, value: 10 });
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(5);
+
+        await roulette.withdrawWinnings({ from: secondAccount});
+        
+        try {
+            await roulette.withdrawWinnings({ from: secondAccount});
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('There are no withdrawable winnings.'), error.toString());
+        }
+    });
+
+    it("should not allow losing accounts to withdraw", async () => {
+        // Place some bets, close betting and set a winning number.
+        await roulette.betOnOddNumber({ from: secondAccount, value: 10 });
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(6);
+
+        try {
+            await roulette.withdrawWinnings({ from: secondAccount});
+            assert.fail()
+        } catch (error) {
+            assert(error.toString().includes('There are no withdrawable winnings.'), error.toString());
+        }        
     });
 });
