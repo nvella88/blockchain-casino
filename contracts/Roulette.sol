@@ -153,13 +153,11 @@ contract Roulette{
     // Winnings are not paid automatically, instead the users call the withdraw function.
     // 
     function withdrawWinnings() public {
-        uint transferAmount = playerWinnings[msg.sender];
-        
         require(!isTableOpen,"The table is not closed for betting.");
         require(winningNumber > -1, "No winning number is set.");
         require(playerWinnings[msg.sender] != 0, "There are no withdrawable winnings.");
         require(address(this).balance >= playerWinnings[msg.sender], "There are not enough funds to transfer.");
-        
+        uint transferAmount = playerWinnings[msg.sender];
         
         // Set the winnings mapping to 0 before the transfer.
         playerWinnings[msg.sender] = 0;
