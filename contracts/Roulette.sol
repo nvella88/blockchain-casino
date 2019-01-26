@@ -13,21 +13,27 @@ contract Roulette{
     
     // Mapping to check if an address placed a bet on either odd or even numbers.
     // It is not allowed to bet on both in one session.
-    mapping(address => bool) private oddBets;
-    mapping(address => bool) private evenBets;
+    mapping(address => PlayerSession) private playerSessions;
+    
+    // Mapping which will be populated when a number is drawn and winnings set
+    mapping(address => uint) private playerWinnings;
 
     int16 private winningNumber;
-    bool private isWinningNumberOdd;
+    OddEvenBet private winOddEven;
 
     // Enum representing the choices between odd and even betting
     enum OddEvenBet {
+        None,
+        Zero,
         OddNumber,
         EvenNumber
     }
 
-    // A struct which holds player information for this gaming 'session'
-    struct PlayerSessionInformation {
+    // A struct which holds player information for this gaming 'session'.
+    // A session in this context is the betting information related to this particular table.
+    struct PlayerSession {
         OddEvenBet oddEvenBet;
+        bool isSessionCreated;
     }
 
     // Function modifier which requires the caller 
@@ -73,28 +79,24 @@ contract Roulette{
     function betOnOddNumber() public payable bettingRequirements
     {   
         // One cannot bet twice the same bet.
-        require(!(oddBets[msg.sender]), "Already placed a similar bet.");
+        require(!(playerSessions[msg.sender].isSessionCreated == true && playerSessions[msg.sender].oddEvenBet == OddEvenBet.OddNumber), "Already placed a similar bet.");
         // Either bet on odd or even.
-        require(!(evenBets[msg.sender]), "Already placed a bet on even numbers.");
+        require(!(playerSessions[msg.sender].isSessionCreated == true && playerSessions[msg.sender].oddEvenBet == OddEvenBet.EvenNumber), "Already placed a bet on even numbers.");
         
-        oddBets[msg.sender] = true;
+        registerPlayer(msg.sender);
+        playerSessions[msg.sender].oddEvenBet = OddEvenBet.OddNumber; 
     }
 
     // Bet that the result will be an even number.
     function betOnEvenNumber() public payable bettingRequirements
     {        
         // One cannot bet twice the same bet.
-        require(!(evenBets[msg.sender]), "Already placed a similar bet.");
+        require(!(playerSessions[msg.sender].isSessionCreated == true && playerSessions[msg.sender].oddEvenBet == OddEvenBet.EvenNumber), "Already placed a similar bet.");
         // Either bet on odd or even.
-        require(!(oddBets[msg.sender]), "Already placed a bet on odd numbers.");
-        
-        evenBets[msg.sender] = true;
-    }
-
-    // A function in which checks is betting is allowed.
-    // The idea behind this function is not to allow the roulette 'spin' while players are allowed to bet.
-    function isBettingAllowed() public view returns (bool) {
-        return isTableOpen;
+        require(!(playerSessions[msg.sender].isSessionCreated == true && playerSessions[msg.sender].oddEvenBet == OddEvenBet.OddNumber), "Already placed a bet on odd numbers.");
+    
+        registerPlayer(msg.sender);
+        playerSessions[msg.sender].oddEvenBet = OddEvenBet.EvenNumber;   
     }
 
     // Closes the table for betting.
@@ -106,7 +108,7 @@ contract Roulette{
         isTableOpen = false;
     }
 
-    // Sets the number drawn.
+    // Sets the number drawn and assigns winnings.
     // Only the croupier is allowed to set the number drawn.
     // The function is called after drawing the number, that is, after the 'spin' completes.
     function setWinningNumber(int16 numberDrawn) public ownerRequired {
@@ -115,8 +117,43 @@ contract Roulette{
         // This is not the optimum solution but work for the purposes of this system under development.
         require(winningNumber < 0, "The winning number is already set.");
         require(numberDrawn >= 0 && numberDrawn <= 36, "A valid roulette number is required.");
+        
         winningNumber = numberDrawn;
-        isWinningNumberOdd = (winningNumber % 2 != 0);
+
+        if (winningNumber == 0)
+        {
+            winOddEven = OddEvenBet.Zero;
+        } else if (winningNumber % 2 == 0) {
+            winOddEven = OddEvenBet.EvenNumber;
+        } else {
+            winOddEven = OddEvenBet.OddNumber;
+        }
+
+        // Iterate through all the players registered with this table
+        for(uint i = 0; i < players.length; i++){
+            // Get the session for this table
+            PlayerSession memory playerSession = playerSessions[players[i]];
+            uint totalWinAmount = 0;
+
+            // Process Odd / Even bets; with 1:1 winning ratio.
+            if (playerSession.oddEvenBet == winOddEven)
+            {
+                totalWinAmount += (tableStakeInWei * 2);
+            }
+
+            /** Here go other winning processing computations. 
+             ** No other code is added because this smart contract support only one type of bet. 
+             */
+
+             // At the end of it all map the winnings
+             playerWinnings[players[i]] = totalWinAmount;
+        }
+    }
+
+    // A function in which checks is betting is allowed.
+    // The idea behind this function is not to allow the roulette 'spin' while players are allowed to bet.
+    function isBettingAllowed() public view returns (bool) {
+        return isTableOpen;
     }
 
     // Get the winning number.
@@ -124,11 +161,26 @@ contract Roulette{
         return winningNumber;
     }
 
+    // Get the winning number.
+    function isPlayerSessionCreated(address player) public ownerRequired view returns (bool) {
+         return playerSessions[player].isSessionCreated;
+    }
+
     // Closes the table, destroying the smart contract.
     // Only the croupier is allowed to close the table.
     function closeTable() public ownerRequired {
         // Convert croupier frm address to address payable.
         selfdestruct(address(uint160(croupier)));
+    }
+
+    // Registers a new player, setting up all the required sessson information.
+    function registerPlayer(address player) private{
+        // If a new player, it is added to the address list
+        if(!playerSessions[msg.sender].isSessionCreated)
+        {
+            players.push(player);
+            playerSessions[msg.sender] = PlayerSession(OddEvenBet.None, true);
+        }
     }
 
     // The fallback function is used when the smart contract is called 

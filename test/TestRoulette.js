@@ -17,6 +17,17 @@ contract("Roulette", accounts => {
         assert(result, 10);
     });
 
+    it("should not create a session if a player has never placed a bet", async () => {
+        var result = await roulette.isPlayerSessionCreated(secondAccount, { from: firstAccount });
+        assert(result === false);
+    });
+
+    it("should create a session if a user placed a bet", async () => {
+        await roulette.betOnOddNumber({ from: secondAccount, value: 10 });
+        var result = await roulette.isPlayerSessionCreated(secondAccount, { from: firstAccount });
+        assert(result === true);
+    });
+
     // Bet placement logic, that is, testing requires.
     // Source: https://medium.com/@gus_tavo_guim/testing-your-smart-contracts-with-javascript-40d4edc2abed
     it("should not allow croupier to place a bet", async () => {
