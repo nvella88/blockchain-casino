@@ -151,7 +151,7 @@ contract("Roulette", accounts => {
         await roulette.setWinningNumber(5);
 
         await roulette.withdrawWinnings({ from: secondAccount});
-        
+
         try {
             await roulette.withdrawWinnings({ from: secondAccount});
             assert.fail()
