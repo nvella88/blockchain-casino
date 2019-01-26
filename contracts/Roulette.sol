@@ -152,7 +152,7 @@ contract Roulette{
 
     // Winnings are not paid automatically, instead the users call the withdraw function.
     // Reference: Mastermind.sol > withdrawWinnings()
-    // This is a security feature to avoid exploits from bugs, also referred to as the Withdrawal patter,
+    // This is a security feature to avoid exploits from bugs, also referred to as the Withdrawal pattern.
     function withdrawWinnings() public {
         require(!isTableOpen,"The table is not closed for betting.");
         require(winningNumber > -1, "No winning number is set.");
