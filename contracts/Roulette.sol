@@ -3,6 +3,9 @@ pragma solidity ^0.4.24;
 contract Roulette{
     // The croupier is the creator/owner of the smart contract.
     address public croupier;
+
+    // Array of players participating in this table
+    address[] public players;
     
     // The roulette gas a fixed stake set by the croupier.
     uint private tableStakeInWei;    
@@ -15,6 +18,17 @@ contract Roulette{
 
     int16 private winningNumber;
     bool private isWinningNumberOdd;
+
+    // Enum representing the choices between odd and even betting
+    enum OddEvenBet {
+        OddNumber,
+        EvenNumber
+    }
+
+    // A struct which holds player information for this gaming 'session'
+    struct PlayerSessionInformation {
+        OddEvenBet oddEvenBet;
+    }
 
     // Function modifier which requires the caller 
     // of the function to be the owner of the contract.
