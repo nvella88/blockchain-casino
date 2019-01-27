@@ -1,13 +1,3 @@
-// Import dependencies
-import { default as Web3 } from 'web3'
-import { default as contract } from 'truffle-contract'
-
-// Import contract artifacts and turn them into usable abstractions.
-import rouletteArtifact from '../../build/contracts/Roulette.json'
-const Roulette = contract(rouletteArtifact)
-
-/** The initialization above has been referenced from Mastermind. */
-
 App = {
   web3Provider: null,
   contracts: {},
@@ -27,13 +17,13 @@ App = {
   },
 
   initContract: function () {
-    $.getJSON('Adoption.json', function (data) {
+    $.getJSON('Roulette.json', function (data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract
-      var AdoptionArtifact = data;
-      App.contracts.Adoption = TruffleContract(AdoptionArtifact);
+      var RouletteArtifact = data;
+      App.contracts.Roulette = TruffleContract(RouletteArtifact);
 
       // Set the provider for our contract
-      App.contracts.Adoption.setProvider(App.web3Provider);
+      App.contracts.Roulette.setProvider(App.web3Provider);
     });
 
     return App.bindEvents();
