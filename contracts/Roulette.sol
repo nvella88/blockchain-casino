@@ -2,10 +2,10 @@ pragma solidity ^0.4.24;
 
 contract Roulette{
     // The croupier is the creator/owner of the smart contract.
-    address public croupier;
+    address private croupier;
 
     // Array of players participating in this table
-    address[] public players;
+    address[] private players;
     
     // The roulette gas a fixed stake set by the croupier.
     uint private tableStakeInWei;    
@@ -190,9 +190,15 @@ contract Roulette{
         return playerWinnings[msg.sender];
     }
 
-    // Closes the table, destroying the smart contract.
+    // Closes the table, destroying the smart contract and transferring the remaining balance to the croupier.
     // Only the croupier is allowed to close the table.
+    // Improvement: Rather than destroy, reset the values in the smart contract for reusability. It is expensive to deploy smart contracts.
+    // Improvement: Check if any players did not withdraw the winnings and store those values accordingly.
+    // It is not a good idea to prevent destroying the contract if players did not withdraw their winnings.
+    // Players may exploit this functionality by willingly leaving the winnings their to sabotage the croupier.
     function closeTable() public ownerRequired {
+        require(!isTableOpen,"The table is not closed for betting.");
+        require(winningNumber > -1, "No winning number is set.");
         // Convert croupier frm address to address payable.
         selfdestruct(address(uint160(croupier)));
     }

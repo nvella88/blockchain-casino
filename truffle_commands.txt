@@ -1,5 +1,0 @@
-truffle networks --clean
-truffle compile --migrate-all --reset
-truffle migrate --reset
-
-npm run dev

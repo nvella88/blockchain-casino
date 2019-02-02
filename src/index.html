@@ -1,40 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Blockchain Casino</title>
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>Blockchain Casino</title>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+  <!-- Bootstrap -->
+  <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">Blockchain Casino</h1>
-          <hr/>
-          <br/>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-8 col-sm-push-2">
+        <h1 class="text-center">
+          Blockchain Casino - Roulette
+          <br />
+          <!-- Value retrieved dynamically from contract -->
+          <small>Table Stake - <span id="table-stake"></span> Wei</small>
+        </h1>
+        <hr />
+        <br />
+      </div>
+    </div>
+
+    <div class="card bg-light mb-3" style="width: 35%;">
+      <div class="card-header">
+        Instructions
+      </div>
+      <div class="card-body">
+        <p class="card-text">Every card performs an operation on the smart contract.</p>
+        <p class="card-text" style="color: green">Green cards indicate valid operations.</p>
+        <p class="card-text" style="color: red">Red cards indicate disallowed operations.</p>
+        <p class="card-text">Neutral cards indicate that the operation is successful or not depending on user input.</p>
+      </div>
+    </div>
+    <br />
+    <div class="card-deck" style="margin-bottom:10px">
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Bet - Odd Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 1</h6>
+          <p class="card-text">This is a valid bet on an odd number.</p>
+          <button class="btn btn-light" onclick="App.betOnOddNumber(1)">Place bet</button>
+        </div>
+      </div>
+      <div class="card bg-danger text-white bg-3">
+        <div class="card-header">
+          Bet - Odd Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 1</h6>
+          <p class="card-text">It is not possible to place the same bet twice.</p>
+          <button class="btn btn-light" onclick="App.betOnOddNumber(1)">Place bet</button>
+        </div>
+      </div>
+      <div class="card bg-danger text-white bg-3">
+        <div class="card-header">
+          Bet - Even Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 1</h6>
+          <p class="card-text">It is not possible to bet on bot odd and even numbers.</p>
+          <button class="btn btn-light" onclick="App.betOnEvenNumber(1)">Place bet</button>
         </div>
       </div>
     </div>
-    <span id="table-stake"></span>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/web3.min.js"></script>
-    <script src="js/truffle-contract.js"></script>
-    <script src="js/app.js"></script>
-  </body>
+    <div class="card-deck" style="margin-bottom:10px">
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Bet - Odd Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 2</h6>
+          <p class="card-text">A valid bet to increase the prize pool.</p>
+          <button class="btn btn-light" onclick="App.betOnOddNumber(2)">Place bet</button>
+        </div>
+      </div>
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Bet - Even Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 3</h6>
+          <p class="card-text">A valid bet to increase the prize pool.</p>
+          <button class="btn btn-light" onclick="App.betOnEvenNumber(3)">Place bet</button>
+        </div>
+      </div>
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Bet - Even Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 4</h6>
+          <p class="card-text">A valid bet to increase the prize pool.</p>
+          <button class="btn btn-light" onclick="App.betOnEvenNumber(4)">Place bet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-deck" style="margin-bottom:10px">
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Close bets
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Croupier</h6>
+          <p class="card-text">Only the croupier can close bets.</p>
+          <button class="btn btn-light" onclick="App.closeBets()">Close bets</button>
+        </div>
+      </div>
+      <div class="card bg-danger text-white bg-3">
+        <div class="card-header">
+          Close bets
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Croupier</h6>
+          <p class="card-text">This operation is allowed once.</p>
+          <button class="btn btn-light" onclick="App.closeBets()">Close bets</button>
+        </div>
+      </div>
+      <div class="card bg-danger text-white bg-3">
+        <div class="card-header">
+          Bet - Even Number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 5</h6>
+          <p class="card-text">It is not possible to bet on a closed table.</p>
+          <button class="btn btn-light" onclick="App.betOnEvenNumber(5)">Place bet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-deck" style="margin-bottom:10px">
+      <div class="card bg-light bg-3">
+        <div class="card-header">
+          Set winning number
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Croupier</h6>
+          <p class="card-text">Set the winning number.</p>
+          <p class="card-text">Only numbers between 0 and 36 are allowed.</p>
+          <p class="card-text">This operation can be done only once.</p>
+          <label for="winning-number">Winning number:</label>
+          <input class="form-control" id="winning-number" type="number" value="5" />
+          <br />
+          <button class="btn btn-primary" onclick="App.setWinningNumber()">Update</button>
+        </div>
+      </div>
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Check winnings
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 1 (Odd Bet)</h6>
+          <p class="card-text">Players can verify their winnings.</p>
+          <p class="card-text">This can only be done after the winning number has been set.</p>
+          <button class="btn btn-light" onclick="App.getWithdrawableBalance(1)">Check winnings</button>
+        </div>
+      </div>
+      <div class="card bg-success text-white bg-3">
+        <div class="card-header">
+          Check winnings
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 3 (Even bet)</h6>
+          <p class="card-text">Players can verify their winnings.</p>
+          <p class="card-text">This can only be done after the winning number has been set.</p>
+          <button class="btn btn-light" onclick="App.getWithdrawableBalance(3)">Check winnings</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-deck" style="margin-bottom:10px">
+      <div class="card bg-light bg-3">
+        <div class="card-header">
+          Withdraw Winnings
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 1 (Odd bet)</h6>
+          <p class="card-text">Withdraw winnings if player won.</p>
+          <p class="card-text">This operation is allowed once.</p>
+          <button class="btn btn-primary" onclick="App.withdrawWinnings(1)">Withdraw</button>
+        </div>
+      </div>
+      <div class="card bg-light bg-3">
+        <div class="card-header">
+          Withdraw Winnings
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Player 3 (Even bet)</h6>
+          <p class="card-text">Withdraw winnings if player won.</p>
+          <p class="card-text">This operation is allowed once.</p>
+          <button class="btn btn-primary" onclick="App.withdrawWinnings(3)">Withdraw</button>
+        </div>
+      </div>
+      <div class="card bg-light bg-3">
+        <div class="card-header">
+          Close Table
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">Account: Croupier</h6>
+          <p class="card-text">Destroys the contract and closes the table.</p>
+          <button class="btn btn-primary" onclick="App.closeTable()">Close table</button>
+        </div>
+      </div>
+    </div>
+    <!-- container -->
+  </div>
+  <br />
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/truffle-contract.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
 </html>

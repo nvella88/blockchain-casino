@@ -18,7 +18,7 @@ App = {
     // A more realistic scenario would be to load Metamask and connect it to the Etherium network of choice.
     // In this case the development network will always be used.
     // Reference: https://truffleframework.com/tutorials/pet-shop
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));    
+    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
     return App.initContract();
   },
 
@@ -31,7 +31,7 @@ App = {
       App.contracts.Roulette.setProvider(web3.currentProvider);
 
       return App.loadAccounts();
-    });    
+    });
   },
 
   // Get accounts and assign the values to this instance.
@@ -49,7 +49,7 @@ App = {
   },
 
   // Get table stake and show on page.
-  // Payment is done automatically too in this way.
+  // Payment is done automatically by using the value stored in the App instance.
   getTableStake: function () {
     App.contracts.Roulette.deployed().then(function (instance) {
       return instance.getTableStake({ from: App.croupierAccount });
@@ -61,16 +61,19 @@ App = {
     });
   },
 
+  // Since MetaMask is not being used, we need to set the gas in the code.
+  // MetaMask makes automatic estimates on behalf of the user.
   // Player function
   betOnOddNumber: function (accountIndex) {
     App.contracts.Roulette.deployed().then(function (instance) {
       playerAccount = App.accounts[accountIndex];
-      return instance.betOnOddNumber({ from: playerAccount, value: App.tableStake })
+      return instance.betOnOddNumber({ from: playerAccount, value: App.tableStake, gas: 1400000 })
     }).then(function () {
       alert('Bet has been placed.');
     }).catch(function (error) {
-      alert('Something went wrong.');
-      console.log(error.message);
+      // Show error to user.
+      // This is not a good practice. The error should be processed and the UI updated accordingly.
+      alert(error.message);
     });
   },
 
@@ -78,21 +81,18 @@ App = {
   betOnEvenNumber: function (accountIndex) {
     App.contracts.Roulette.deployed().then(function (instance) {
       playerAccount = App.accounts[accountIndex];
-      return instance.betOnEvenNumber({ from: playerAccount, value: App.tableStake })
+      return instance.betOnEvenNumber({ from: playerAccount, value: App.tableStake, gas: 1400000 })
     }).then(function () {
       alert('Bet has been placed.');
     }).catch(function (error) {
-      alert('Something went wrong.');
-      console.log(error.message);
+      alert(error.message);
     });
   },
 
   // Administrator / croupier function.
-  // When functions must be called by the croupier, 
-  // the error message can be shown using alert.
   closeBets: function () {
     App.contracts.Roulette.deployed().then(function (instance) {
-      return instance.closeBets({ from: App.croupierAccount });
+      return instance.closeBets({ from: App.croupierAccount, gas: 1400000 });
     }).then(function () {
       alert('Table has been closed for betting.');
     }).catch(function (error) {
@@ -104,7 +104,7 @@ App = {
   setWinningNumber: function () {
     App.contracts.Roulette.deployed().then(function (instance) {
       var winningNumber = document.getElementById('winning-number').value;
-      return instance.closeBets(winningNumber, { from: App.croupierAccount });
+      return instance.setWinningNumber(winningNumber, { from: App.croupierAccount, gas: 1400000 });
     }).then(function () {
       alert('Winning number has been set.');
     }).catch(function (error) {
@@ -116,12 +116,11 @@ App = {
   getWithdrawableBalance: function (accountIndex) {
     App.contracts.Roulette.deployed().then(function (instance) {
       playerAccount = App.accounts[accountIndex];
-      return instance.closeBets(winningNumber, { from: playerAccount });
+      return instance.getWithdrawableBalance({ from: playerAccount, gas: 1400000 });
     }).then(function (result) {
-      alert('Your winnings are: ' + result);
+      alert('Your winnings are: ' + result + ' Wei');
     }).catch(function (error) {
-      alert('Something went wrong.');
-      console.log(error.message);
+      alert(error.message);
     });
   },
 
@@ -129,14 +128,24 @@ App = {
   withdrawWinnings: function (accountIndex) {
     App.contracts.Roulette.deployed().then(function (instance) {
       playerAccount = App.accounts[accountIndex];
-      return instance.withdrawWinnings(winningNumber, { from: playerAccount });
-    }).then(function (result) {
-      alert('Your winnings are: ' + result);
+      return instance.withdrawWinnings({ from: playerAccount, gas: 1400000 });
+    }).then(function () {
+      alert('Table closed.');
     }).catch(function (error) {
-      alert('Something went wrong.');
-      console.log(error.message);
+      alert(error.message);
+    });    
+  },
+
+  // Croupier function
+  closeTable: function () {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      return instance.closeTable({ from: App.croupierAccount, gas: 1400000 });
+    }).then(function () {
+      alert('Table closed.');
+    }).catch(function (error) {
+      alert(error.message);
     });
-  }
+  },
 };
 
 $(function () {
