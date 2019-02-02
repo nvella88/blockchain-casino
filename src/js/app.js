@@ -1,6 +1,13 @@
 App = {
   web3Provider: null,
   contracts: {},
+  // The addresses on the network will be retrieved once.
+  // This setup will make use of more then one address.
+  accounts,
+  // Croupier account (accounts[0]) will be assigned to a variable. It will be easier to follow.
+  // The rest of the accounts will be read from the array, accounts[1], and so on.
+  croupierAccount,
+  tableStake,
 
   init: async function () {
     return await App.initWeb3();
@@ -26,40 +33,112 @@ App = {
       App.contracts.Roulette.setProvider(App.web3Provider);
     });
 
-    return App.bindEvents();
+    return App.loadAccounts();
   },
 
-  bindEvents: function () {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
-  },
-
-  handleAdopt: function (event) {
-    event.preventDefault();
-
-    var petId = parseInt($(event.target).data('id'));
-
-    var adoptionInstance;
-
+  // Get accounts and assign the values to this instance.
+  loadAccounts: function () {
     web3.eth.getAccounts(function (error, accounts) {
       if (error) {
         console.log(error);
       }
 
-      var account = accounts[0];
+      App.accounts = accounts;
+      App.croupierAccount = App.accounts[0];
+    });
 
-      App.contracts.Adoption.deployed().then(function (instance) {
-        adoptionInstance = instance;
+    return App.getTableStake();
+  },
 
-        // Execute adopt as a transaction by sending account
-        return adoptionInstance.adopt(petId, { from: account });
-      }).then(function (result) {
-        return App.markAdopted();
-      }).catch(function (err) {
-        console.log(err.message);
-      });
+  // Get table stake and show on page.
+  // Payment is done automatically too in this way.
+  getTableStake: function () {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      return instance.getTableStake({ from: App.croupierAccount });
+    }).then(function (result) {
+      App.tableStake = result;
+      document.getElementById('table-stake').innerHTML = App.tableStake;
+    }).catch(function (error) {
+      console.log(error.message);
+    });
+  },
+
+  // Player function
+  betOnOddNumber: function (accountIndex) {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      playerAccount = App.accounts[accountIndex];
+      return instance.betOnOddNumber({ from: playerAccount, value: App.tableStake })
+    }).then(function () {
+      alert('Bet has been placed.');
+    }).catch(function (error) {
+      alert('Something went wrong.');
+      console.log(error.message);
+    });
+  },
+
+  // Player function
+  betOnEvenNumber: function (accountIndex) {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      playerAccount = App.accounts[accountIndex];
+      return instance.betOnEvenNumber({ from: playerAccount, value: App.tableStake })
+    }).then(function () {
+      alert('Bet has been placed.');
+    }).catch(function (error) {
+      alert('Something went wrong.');
+      console.log(error.message);
+    });
+  },
+
+  // Administrator / croupier function.
+  // When functions must be called by the croupier, 
+  // the error message can be shown using alert.
+  closeBets: function () {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      return instance.closeBets({ from: App.croupierAccount });
+    }).then(function () {
+      alert('Table has been closed for betting.');
+    }).catch(function (error) {
+      alert(error.message);
+    });
+  },
+
+  // Croupier function
+  setWinningNumber: function () {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      var winningNumber = document.getElementById('winning-number').value;
+      return instance.closeBets(winningNumber, { from: App.croupierAccount });
+    }).then(function () {
+      alert('Winning number has been set.');
+    }).catch(function (error) {
+      alert(error.message);
+    });
+  },
+
+  // Player function
+  getWithdrawableBalance: function (accountIndex) {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      playerAccount = App.accounts[accountIndex];
+      return instance.closeBets(winningNumber, { from: playerAccount });
+    }).then(function (result) {
+      alert('Your winnings are: ' + result);
+    }).catch(function (error) {
+      alert('Something went wrong.');
+      console.log(error.message);
+    });
+  },
+
+  // Player function
+  withdrawWinnings: function (accountIndex) {
+    App.contracts.Roulette.deployed().then(function (instance) {
+      playerAccount = App.accounts[accountIndex];
+      return instance.withdrawWinnings(winningNumber, { from: playerAccount });
+    }).then(function (result) {
+      alert('Your winnings are: ' + result);
+    }).catch(function (error) {
+      alert('Something went wrong.');
+      console.log(error.message);
     });
   }
-
 };
 
 $(function () {

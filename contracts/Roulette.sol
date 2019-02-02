@@ -13,9 +13,11 @@ contract Roulette{
     
     // Mapping to check if an address placed a bet on either odd or even numbers.
     // It is not allowed to bet on both in one session.
+    // In a proper scenario alternative persistance methods should be used, for example a database.
+    // In this case mappings are easier since no query logic is required (for example iterating and checking conditions are met).
     mapping(address => PlayerSession) private playerSessions;
     
-    // Mapping which will be populated when a number is drawn and winnings set
+    // Mapping which will be populated when a number is drawn and winnings set.
     mapping(address => uint) private playerWinnings;
 
     int16 private winningNumber;
