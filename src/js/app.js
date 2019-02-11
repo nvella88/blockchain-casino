@@ -18,7 +18,7 @@ App = {
     // A more realistic scenario would be to load Metamask and connect it to the Etherium network of choice.
     // In this case the development network will always be used.
     // Reference: https://truffleframework.com/tutorials/pet-shop
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
+    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'));
     return App.initContract();
   },
 
