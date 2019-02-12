@@ -112,7 +112,7 @@ contract Roulette{
 
     // Sets the number drawn and assigns winnings.
     // Only the croupier is allowed to set the number drawn.
-    // The function is called after drawing the number, that is, after the 'spin' completes.
+    // The function is called after drawing the number, that is after the 'spin' completes.
     function setWinningNumber(int16 numberDrawn) public ownerRequired {
         require(!isTableOpen,"The table must be closed for betting.");
         // The winning number can only se set once.
@@ -131,7 +131,8 @@ contract Roulette{
             winOddEven = OddEvenBet.OddNumber;
         }
 
-        // Iterate through all the players registered with this table
+        // Iterate through all the players registered with this table.
+        // Mapping Iterator pattern.
         for(uint i = 0; i < players.length; i++){
             // Get the session for this table
             PlayerSession memory playerSession = playerSessions[players[i]];
@@ -147,7 +148,7 @@ contract Roulette{
              ** No other code is added because this smart contract support only one type of bet. 
              */
 
-             // At the end of it all map the winnings
+             // At the end of it, all map the winnings
              playerWinnings[players[i]] = totalWinAmount;
         }
     }
@@ -199,7 +200,7 @@ contract Roulette{
     function closeTable() public ownerRequired {
         require(!isTableOpen,"The table is not closed for betting.");
         require(winningNumber > -1, "No winning number is set.");
-        // Convert croupier frm address to address payable.
+        // Convert croupier from address to address payable.
         selfdestruct(address(uint160(croupier)));
     }
 
