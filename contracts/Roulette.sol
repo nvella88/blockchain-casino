@@ -49,6 +49,11 @@ contract Roulette{
         _;
     }
 
+    // Require vs Assert vs Require
+    // All are viable as guards and achieve the same purpose in different ways.
+    // Require was used because it refunds any remaining gas.
+    // Source: https://medium.com/blockchannel/the-use-of-revert-assert-and-require-in-solidity-and-the-new-revert-opcode-in-the-evm-1a3a7990e06e
+
     // Common requirements to place bets, refactored under one modifier.
     // The croupier/owner cannot place a bet.
     // Payment must match stake.
