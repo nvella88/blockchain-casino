@@ -22,6 +22,9 @@ truffle migrate --reset
 
 The `--reset` flag ensures migrations are run from the beginning ([source](https://truffleframework.com/docs/truffle/reference/truffle-commands)).
 
+## Tests execution
+![root_folder](screenshots/tests.jpg)
+
 ## Usage: Frontend
 The frontend has been written using HTML, Bootstrap 4.0 and jQuery. Bootstrap and jQuery are served using CDNs. An npm package called `lite-server` is used to run the frontend application locally ([source](https://truffleframework.com/tutorials/pet-shop)). With the CLI open in the directory of the project, run the following commands.
 ```bash
