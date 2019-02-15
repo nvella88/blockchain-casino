@@ -1,4 +1,4 @@
-# Design Patterns
+# Design Patterns Decisions
 
 Useful design patterns were used in the creation of this smart contract.
 
