@@ -8,7 +8,7 @@ Self-destructing a smart contract is the process of removing it from the blockch
 
 In the roulette smart contract, the table is closed by the destruction of the smart contract. Only the croupier is allowed to call this function. Any remaining funds will be transferred to him/her.
 
-This is an inefficient way for replayability. A less expensive approach is to reset any values holding game data. A more elaborate approach is to use data stores to hold game session identifiers, along with players and game data linked to said game session.
+This is an inefficient way for replayability. A less expensive approach is to reset any values holding game data. A more elaborate approach is to use data stores to hold game session identifiers, along with players and game data linked to said game session ([source](https://medium.com/@i6mi6/solidty-smart-contracts-design-patterns-ecfa3b1e9784)).
 
 ```solidity
 function closeTable() public ownerRequired {
@@ -20,7 +20,7 @@ function closeTable() public ownerRequired {
 ```
 
 ## Mapping Iterator
-In Solidity, the mapping data type is very useful but cannot be iterated. The mapping iterator pattern is the process of using an array holding the keys of the mapping variable and iterate through that instead.
+In Solidity, the mapping data type is very useful but cannot be iterated. The mapping iterator pattern is the process of using an array holding the keys of the mapping variable and iterate through that instead ([source](https://medium.com/@i6mi6/solidty-smart-contracts-design-patterns-ecfa3b1e9784)).
 
 ```solidity
 // Array of players participating in this table
@@ -56,7 +56,7 @@ function setWinningNumber(int16 numberDrawn) public ownerRequired {
 ## Withdrawal Pattern
 Sending funds to other contracts may impose several unnecessary risks to the sender. The recipient might purposely throw exceptions in its fallback function in order to deplete the funds of its callers or the sender might run out of gas. When paying multiple recipients, the process might crash halfway through the list, allowing the method to be called again or not having the paid recipient list properly updated. This can allow a recipient to be paid indefinitely until the sender's funds are depleted.
 
-A safer approach is to create a function, allowing users to withdraw funds. In the developed system, players who are eligible for withdrawal will have Wei transferred to their address.
+A safer approach is to create a function, allowing users to withdraw funds. In the developed system, players who are eligible for withdrawal will have Wei transferred to their address ([source](https://medium.com/@i6mi6/solidty-smart-contracts-design-patterns-ecfa3b1e9784)).
 
 ```solidity
 // Winnings are not paid automatically, instead the users call the withdraw function.
@@ -74,4 +74,3 @@ function withdrawWinnings() public {
     require(msg.sender.send(transferAmount));
 }
 ```
-
