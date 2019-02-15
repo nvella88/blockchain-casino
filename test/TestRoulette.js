@@ -202,4 +202,21 @@ contract("Roulette", accounts => {
             assert(error.toString().includes('There are no withdrawable winnings.'), error.toString());
         }        
     });
+
+    it("should allow the croupier to destroy the contract", async () => {
+        // This tests serves two purposes:
+        // 1. It represents the full business flow of the smart contract.
+        // 2. Verifies the contract can be destroyed by the croupier.
+        
+        await roulette.betOnOddNumber({ from: secondAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: thirdAccount, value: 10 });
+        await roulette.betOnEvenNumber({ from: fourthAccount, value: 10 });
+        await roulette.closeBets({ from: firstAccount });
+        await roulette.setWinningNumber(5);
+        await roulette.withdrawWinnings({ from: secondAccount});
+
+        let result = await roulette.closeTable({ from: firstAccount});
+        
+        assert.equal(result.receipt.status, true);
+    });
 });

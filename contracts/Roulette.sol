@@ -60,6 +60,8 @@ contract Roulette{
         _;
     }
 
+    event winningNumberDrawn(int16 winningNumber);
+
     constructor(uint stakeAmountInWei) public
     {
         require(stakeAmountInWei > 0, "A stake is required to open a table.");
@@ -121,6 +123,7 @@ contract Roulette{
         require(numberDrawn >= 0 && numberDrawn <= 36, "A valid roulette number is required.");
         
         winningNumber = numberDrawn;
+        emit winningNumberDrawn(winningNumber);
 
         if (winningNumber == 0)
         {

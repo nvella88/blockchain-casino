@@ -18,7 +18,7 @@ function getTableStake() public view returns (uint) {
 }
 ```
 
-## Owner restricted functions
+## Access Control
 Some functions should not be done by everyone so a function modifier called `ownerRequired` was created. This requires the sender's to match the owner's (croupier's) address ([source](https://solidity.readthedocs.io/en/v0.5.1/structure-of-a-contract.html?highlight=modifiers#structure-function-modifiers)).
 
 ```solidity
