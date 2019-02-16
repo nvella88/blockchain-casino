@@ -130,7 +130,7 @@ App = {
       playerAccount = App.accounts[accountIndex];
       return instance.withdrawWinnings({ from: playerAccount, gas: 1400000 });
     }).then(function () {
-      alert('Table closed.');
+      alert('Your winnings have been transferred to your account.');
     }).catch(function (error) {
       alert(error.message);
     });    

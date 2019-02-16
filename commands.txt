@@ -1,9 +1,0 @@
-truffle compile
-truffle migrate --reset
-
-# The website can be served using lite-server
-# Install packages 
-npm install
-
-# Run application
-npm run dev
