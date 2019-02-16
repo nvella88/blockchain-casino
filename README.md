@@ -1,6 +1,9 @@
 # Blockchain Casino
 
-The aim of this project is to simulate an online casino using blockchain technology.
+The aim of this project is to simulate an online casino using blockchain technology. PDF version of all markdown files are found in the `documentation` folder.
+
+## Source code
+The source code along with its commit history is publicly available on this [GitHub repository](https://github.com/nvella88/blockchain-casino).
 
 ## About the system
 
