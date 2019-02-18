@@ -65,3 +65,33 @@ function withdrawWinnings() public {
     require(msg.sender.send(transferAmount));
 }
 ```
+
+## Integer Overflow
+Integer overflow occurs when a variable stores a value bigger than its limit. A common occurance is in mathematical formulas. Such vulnerability can be mitigated bu using the SafeMath library provided by Open Zeppelin ([source](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol)).
+
+Another occurance is the counter variable in loops. When using `var` to store a loop counter, the type will be `uint8` because it is enough to hold the value of 0. If the array, say in a `for` loop, has more than 255 elements, the loop will not terminate, consuming all the gas.
+
+A way to mitigate this is to use `uint` for the counter variable ([source](https://ethereum.stackexchange.com/questions/7293/is-it-possible-to-overflow-uints)).
+
+```solidity
+// Iterate through all the players registered with this table.
+// Mapping Iterator pattern.
+for(uint i = 0; i < players.length; i++){
+    // Get the session for this table
+    PlayerSession memory playerSession = playerSessions[players[i]];
+    uint totalWinAmount = 0;
+
+    // Process Odd / Even bets; with 1:1 winning ratio.
+    if (playerSession.oddEvenBet == winOddEven)
+    {
+        totalWinAmount += (tableStakeInWei * 2);
+    }
+
+    /** Here go other winning processing computations. 
+    ** No other code is added because this smart contract support only one type of bet. 
+    */
+
+    // At the end of it, all map the winnings
+    playerWinnings[players[i]] = totalWinAmount;
+}
+```
