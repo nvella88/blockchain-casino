@@ -43,6 +43,13 @@ App = {
 
       App.accounts = accounts;
       App.croupierAccount = App.accounts[0];
+
+      document.getElementById('croupier-account').innerHTML = App.croupierAccount;
+      document.getElementById('player1-account').innerHTML = App.accounts[1];
+      document.getElementById('player2-account').innerHTML = App.accounts[2];
+      document.getElementById('player3-account').innerHTML = App.accounts[3];
+      document.getElementById('player4-account').innerHTML = App.accounts[4];
+      document.getElementById('player5-account').innerHTML = App.accounts[5];
     });
 
     return App.getTableStake();
